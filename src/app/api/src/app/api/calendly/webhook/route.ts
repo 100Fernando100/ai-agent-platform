@@ -1,30 +1,19 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import sgMail from '@sendgrid/mail';
-
-sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+// /app/api/calendly/webhook/route.ts
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  const payload = await req.json();
+  const body = await req.json();
 
-  const email = payload?.payload?.invitee?.email;
-  const name = payload?.payload?.invitee?.name;
-  const event = payload?.event;
+  const eventType = body.event;
+  const payload = body.payload;
 
-  if (!email || !name) {
-    return NextResponse.json({ success: false, error: "Missing data" }, { status: 400 });
-  }
+  console.log("📆 Calendly Webhook Received:", eventType);
+  console.log("👤 Invitee:", payload?.invitee?.name, payload?.invitee?.email);
+  console.log("🕒 Event Start Time:", payload?.event?.start_time);
 
-  try {
-    await sgMail.send({
-      to: email,
-      from: 'your-email@yourdomain.com', // Cambiá esto por tu remitente verificado en SendGrid
-      subject: 'Thanks for booking with us!',
-      html: `<p>Hi ${name},</p><p>Thanks for scheduling a call! We'll see you soon.</p>`,
-    });
+  return NextResponse.json({ success: true });
+}
 
-    return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-  }
+export async function GET() {
+  return NextResponse.json({ message: "Calendly Webhook Ready" });
 }
