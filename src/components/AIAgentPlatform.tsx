@@ -120,10 +120,16 @@ const connectTwilio = async () => {
               <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
               Live
             </Badge>
-            <Button variant="outline" size="sm">
-              <Settings className="w-4 h-4 mr-2" />
-              Settings
-            </Button>
+            import Link from "next/link";
+
+<Link href="/settings">
+  <Button variant="outline" size="sm">
+    <Settings className="w-4 h-4 mr-2" />
+    Settings
+  </Button>
+</Link>
+
+
           </div>
         </div>
       </header>
