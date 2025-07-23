@@ -120,15 +120,19 @@ const connectTwilio = async () => {
               <div className="w-2 h-2 bg-green-500 rounded-full mr-2" />
               Live
             </Badge>
-import Link from "next/link";
 
-<Link href="/settings">
-  <Button variant="outline" size="sm">
-    <Settings className="w-4 h-4 mr-2" />
-    Settings
+// parte superior del archivo
+import Link from 'next/link'; // ✅ Usás comillas simples: ✔️
+import { Button } from '@/components/ui/button'; // ✔️
+import { Settings } from 'lucide-react'; // ✔️
+
+// dentro del componente
+<Link href='/settings'> {/* ✅ href con comillas simples: ✔️ */}
+  <Button variant='outline' size='sm'> {/* ✔️ */}
+    <Settings className='w-4 h-4 mr-2' /> {/* ✔️ */}
+    {'Settings'} {/* ✔️ Esto es opcional, pero correcto si querés insertar texto */}
   </Button>
 </Link>
-
 
           </div>
         </div>
