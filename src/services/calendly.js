@@ -1,6 +1,4 @@
-// services/calendly.js
 import axios from 'axios';
-
 
 class CalendlyService {
   constructor() {
@@ -46,4 +44,5 @@ class CalendlyService {
   }
 }
 
- export default new CalendlyService();
+const calendlyService = new CalendlyService();
+export default calendlyService;
