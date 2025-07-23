@@ -1,15 +1,24 @@
 import twilio from 'twilio';
-import { twilioConfig } from '../config/twilio';
+import { getTwilioConfig } from '../config/twilio';
 
-const client = twilio(twilioConfig.accountSid, twilioConfig.authToken);
+// Helper function to create client only when needed
+const createTwilioClient = () => {
+  const config = getTwilioConfig();
+  return twilio(config.accountSid, config.authToken);
+};
 
 export const sendSMS = async (to, message) => {
   try {
+    // Create client only when function is called
+    const client = createTwilioClient();
+    const config = getTwilioConfig();
+    
     const response = await client.messages.create({
       body: message,
-      from: twilioConfig.phoneNumber,
+      from: config.phoneNumber,
       to: to
     });
+    
     return response;
   } catch (error) {
     console.error('Error sending SMS:', error);
@@ -19,11 +28,16 @@ export const sendSMS = async (to, message) => {
 
 export const makeCall = async (to, twimlUrl) => {
   try {
+    // Create client only when function is called
+    const client = createTwilioClient();
+    const config = getTwilioConfig();
+    
     const call = await client.calls.create({
       url: twimlUrl,
       to: to,
-      from: twilioConfig.phoneNumber
+      from: config.phoneNumber
     });
+    
     return call;
   } catch (error) {
     console.error('Error making call:', error);
