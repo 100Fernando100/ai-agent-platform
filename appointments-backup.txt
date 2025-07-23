@@ -1,0 +1,76 @@
+'use client'
+import { useState } from 'react'
+
+export default function AppointmentsPage() {
+  const [isConnecting, setIsConnecting] = useState(false)
+  const [connectionStatus, setConnectionStatus] = useState<'idle' | 'connected' | 'error'>('idle')
+  const [error, setError] = useState('')
+
+  const handleConnect = async () => {
+    setIsConnecting(true)
+    setError('')
+    
+    try {
+      const response = await fetch('/api/calendly')
+      const data = await response.json()
+      
+      console.log('Response data:', data)
+      
+      if (response.ok && data.hasApiKey) {
+        setConnectionStatus('connected')
+      } else {
+        setConnectionStatus('error')
+        setError('Calendar connection failed')
+      }
+    } catch (err) {
+      setConnectionStatus('error')
+      setError('Connection failed')
+    } finally {
+      setIsConnecting(false)
+    }
+  }
+
+  return (
+    <div style={{ padding: "2rem" }}>
+      <h1>📅 Appointments</h1>
+      <p>Manage your calendar integration and view bookings.</p>
+      
+      <div style={{ 
+        marginTop: "2rem", 
+        padding: "1rem", 
+        border: "1px solid #ddd", 
+        borderRadius: "8px" 
+      }}>
+        <h3>📅 Appointment Booking</h3>
+        <p>Manage your calendar integration</p>
+        
+        {connectionStatus === 'error' && (
+          <div style={{ color: 'red', marginBottom: '1rem' }}>
+            ❌ {error}
+          </div>
+        )}
+        
+        {connectionStatus === 'connected' && (
+          <div style={{ color: 'green', marginBottom: '1rem' }}>
+            ✅ Calendar connected successfully!
+          </div>
+        )}
+        
+        <button 
+          onClick={handleConnect} 
+          disabled={isConnecting}
+          style={{
+            backgroundColor: isConnecting ? '#ccc' : '#000',
+            color: 'white',
+            padding: '0.5rem 1rem',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: isConnecting ? 'not-allowed' : 'pointer'
+          }}
+        >
+          {isConnecting ? 'Connecting...' : 'Connect Calendar'}
+        </button>
+      </div>
+    </div>
+  )
+}
