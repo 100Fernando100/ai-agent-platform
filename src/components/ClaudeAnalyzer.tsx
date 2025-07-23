@@ -1,13 +1,19 @@
 ﻿'use client'
-// components/ClaudeAnalyzer.jsx
+
 import { useState } from 'react'
 
+interface Usage {
+  total_tokens: number;
+  input_tokens: number;
+  output_tokens: number;
+}
+
 export default function ClaudeAnalyzer() {
-  const [input, setInput] = useState('')
-  const [response, setResponse] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [usage, setUsage] = useState(null)
+  const [input, setInput] = useState<string>('')
+  const [response, setResponse] = useState<string>('')
+  const [loading, setLoading] = useState<boolean>(false)
+  const [error, setError] = useState<string | null>(null)
+  const [usage, setUsage] = useState<Usage | null>(null)
 
   const analyzeWithClaude = async () => {
     setLoading(true)
@@ -22,27 +28,24 @@ export default function ClaudeAnalyzer() {
         body: JSON.stringify({
           input: input,
           context: 'Estoy desarrollando una plataforma AI con integraciones de Twilio, Calendly, SendGrid.',
-          systemPrompt: 'Eres un experto en desarrollo web, debugging y integraciones de APIs. Proporciona soluciones concretas y cÃ³digo cuando sea necesario.',
-          temperature: 0.3 // MÃ¡s determinÃ­stico para cÃ³digo
+          systemPrompt: 'Eres un experto en desarrollo web, debugging y integraciones de APIs. Proporciona soluciones concretas y código cuando sea necesario.',
+          temperature: 0.3 // Más determinístico para código
         }),
       })
-
       const data = await res.json()
-
       if (!res.ok) {
         throw new Error(data.error || 'Error al analizar')
       }
-
       setResponse(data.response)
       setUsage(data.usage)
     } catch (err) {
-      setError(err.message)
+      setError(err instanceof Error ? err.message : 'Error desconocido')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleKeyPress = (e) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && e.ctrlKey) {
       analyzeWithClaude()
     }
@@ -61,7 +64,7 @@ export default function ClaudeAnalyzer() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Ejemplo: Failed to compile... o Â¿CÃ³mo integro Calendly?"
+          placeholder="Ejemplo: Failed to compile... o ¿Cómo integro Calendly?"
           className="w-full h-32 p-3 border rounded-lg resize-none"
           disabled={loading}
         />
