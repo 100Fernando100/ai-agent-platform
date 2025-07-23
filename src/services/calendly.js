@@ -1,5 +1,6 @@
 // services/calendly.js
-const axios = require('axios');
+import axios from 'axios';
+
 
 class CalendlyService {
   constructor() {
@@ -45,4 +46,4 @@ class CalendlyService {
   }
 }
 
-module.exports = new CalendlyService();
+ export default new CalendlyService();
