@@ -41,13 +41,39 @@ export default function Dashboard() {
   const [twilioStatus, setTwilioStatus] = useState('Disconnected');
   const [isConnecting, setIsConnecting] = useState(false);
 
-  const connectTwilio = () => {
-    setIsConnecting(true);
-    setTimeout(() => {
+  const connectTwilio = async () => {
+  setIsConnecting(true);
+  setTwilioStatus('Testing...');
+  
+  try {
+    // Test Twilio connection by calling our API
+    const response = await fetch('/api/twilio', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        action: 'test_connection'
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.success) {
       setTwilioStatus('Connected');
-      setIsConnecting(false);
-    }, 1000);
-  };
+      // Optional: Show success message
+      console.log('Twilio connected successfully:', data);
+    } else {
+      setTwilioStatus('Connection Failed');
+      console.error('Twilio connection failed:', data.error);
+    }
+  } catch (error) {
+    setTwilioStatus('Connection Error');
+    console.error('Error testing Twilio connection:', error);
+  } finally {
+    setIsConnecting(false);
+  }
+};
 
   const handleSendMessage = () => {
     if (!currentMessage.trim()) return;
@@ -220,27 +246,64 @@ export default function Dashboard() {
         </TabsContent>
 
         <TabsContent value="voice-sms" className="mt-8">
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Phone className="h-5 w-5" />
-                  Voice & SMS Configuration
-                </CardTitle>
-                <CardDescription>Configure Twilio integration</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Input placeholder="Twilio Account SID" />
-                <Input placeholder="Twilio Auth Token" type="password" />
-                <Input placeholder="Phone Number" />
-                <Button onClick={connectTwilio} disabled={isConnecting}>
-                  {isConnecting ? 'Connecting...' : 'Connect Twilio'}
-                </Button>
-                <p className="text-sm text-gray-600">Status: {twilioStatus}</p>
-              </CardContent>
-            </Card>
+  <div className="grid gap-6 md:grid-cols-2">
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Phone className="h-5 w-5" />
+          Voice & SMS Configuration
+        </CardTitle>
+        <CardDescription>Twilio integration status</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="bg-slate-50 p-4 rounded-lg">
+          <h4 className="font-medium mb-2">Configuration Status</h4>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span>Account SID:</span>
+              <span className={twilioStatus === 'Connected' ? 'text-green-600' : 'text-gray-500'}>
+                {twilioStatus === 'Connected' ? 'Configured ✓' : 'Not configured'}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span>Auth Token:</span>
+              <span className={twilioStatus === 'Connected' ? 'text-green-600' : 'text-gray-500'}>
+                {twilioStatus === 'Connected' ? 'Configured ✓' : 'Not configured'}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span>Phone Number:</span>
+              <span className={twilioStatus === 'Connected' ? 'text-green-600' : 'text-gray-500'}>
+                {twilioStatus === 'Connected' ? 'Configured ✓' : 'Not configured'}
+              </span>
+            </div>
           </div>
-        </TabsContent>
+        </div>
+        
+        <Button 
+          onClick={connectTwilio} 
+          disabled={isConnecting}
+          className={twilioStatus === 'Connected' ? 'bg-green-600 hover:bg-green-700' : ''}
+        >
+          {isConnecting ? 'Testing Connection...' : 
+           twilioStatus === 'Connected' ? 'Connected ✓' : 'Test Connection'}
+        </Button>
+        
+        <p className={`text-sm ${twilioStatus === 'Connected' ? 'text-green-600' : 'text-gray-600'}`}>
+          Status: {twilioStatus}
+        </p>
+        
+        {twilioStatus === 'Connected' && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+            <p className="text-sm text-green-800">
+              ✓ Twilio is configured and ready to send SMS and make calls
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  </div>
+</TabsContent>
 
         <TabsContent value="appointments" className="mt-8">
           <div className="grid gap-6 md:grid-cols-2">

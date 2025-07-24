@@ -1,59 +1,45 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { getTwilioConfig } from '@/config/twilio';
+import twilio from 'twilio';
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
     const { action } = await request.json();
-    
-    if (action === 'test-connection') {
-      // Get environment variables
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
 
-console.log('AccountSid exists:', !!accountSid);
-console.log('AuthToken exists:', !!authToken);
-console.log('Environment variables:', Object.keys(process.env).filter(key => key.includes('TWILIO')));
-      
-      if (!accountSid || !authToken) {
+    if (action === 'test_connection') {
+      // Test Twilio connection using environment variables
+      try {
+        const config = getTwilioConfig();
+        const client = twilio(config.accountSid, config.authToken);
+        
+        // Test by fetching account info (lightweight operation)
+        const account = await client.api.accounts(config.accountSid).fetch();
+        
+        return NextResponse.json({ 
+          success: true, 
+          message: 'Twilio connection successful',
+          accountName: account.friendlyName,
+          status: account.status
+        });
+      } catch (error) {
+        console.error('Twilio connection test failed:', error);
         return NextResponse.json(
-          { success: false, error: 'Twilio credentials not configured' },
+          { 
+            success: false, 
+            error: error instanceof Error ? error.message : 'Unknown error',
+            details: 'Check your Twilio credentials in environment variables'
+          },
           { status: 400 }
         );
       }
-      
-      // Test connection by fetching account info
-      const response = await fetch(
-        `https://api.twilio.com/2010-04-01/Accounts/${accountSid}.json`,
-        {
-          method: 'GET',
-          headers: {
-            'Authorization': `Basic ${Buffer.from(`${accountSid}:${authToken}`).toString('base64')}`,
-          },
-        }
-      );
-      
-      if (response.ok) {
-        const accountData = await response.json();
-        return NextResponse.json({
-          success: true,
-          message: 'Connected to Twilio successfully!',
-          accountName: accountData.friendly_name,
-          status: accountData.status
-        });
-      } else {
-        return NextResponse.json(
-          { success: false, error: 'Invalid Twilio credentials' },
-          { status: 401 }
-        );
-      }
     }
-    
+
     return NextResponse.json(
       { success: false, error: 'Invalid action' },
       { status: 400 }
     );
-    
   } catch (error) {
-    console.error('Twilio API error:', error);
+    console.error('API error:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }
