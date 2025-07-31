@@ -42,4 +42,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Environment variables
+.env
+.env.local
+.env.production
+# Keep .env.demo and .env.example in version control
+
 .vercel
