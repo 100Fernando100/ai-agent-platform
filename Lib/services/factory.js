@@ -1,13 +1,13 @@
-// /lib/services/factory.js
-import { config } from '../config';
+﻿import { config } from '../config';
+
+// Mock services
 import { MockTwilioService } from './demo/mockTwilio';
 import { MockCalendlyService } from './demo/mockCalendly';
 import { MockOpenAIService } from './demo/mockOpenAI';
-
-// Real service imports (create these based on your actual implementations)
-// import { TwilioService } from './twilio';
-// import { CalendlyService } from './calendly';
-// import { OpenAIService } from './openai';
+import { MockAirtableService } from './demo/mockAirtable';
+import { MockSendGridService } from './demo/mockSendGrid';
+import { MockHeyGenService } from './demo/mockHeyGen';
+import { MockVAPIService } from './demo/mockVAPI';
 
 class ServiceFactory {
   constructor() {
@@ -16,29 +16,51 @@ class ServiceFactory {
 
   getTwilioService() {
     if (!this.services.twilio) {
-      this.services.twilio = new config.isDemoMode 
-        ? new MockTwilioService()
-        : new TwilioService(config.twilio);
+      this.services.twilio = new MockTwilioService();
     }
     return this.services.twilio;
   }
 
   getCalendlyService() {
     if (!this.services.calendly) {
-      this.services.calendly = new config.isDemoMode
-        ? new MockCalendlyService()
-        : new CalendlyService(config.calendly);
+      this.services.calendly = new MockCalendlyService();
     }
     return this.services.calendly;
   }
 
   getOpenAIService() {
     if (!this.services.openai) {
-      this.services.openai = new config.isDemoMode
-        ? new MockOpenAIService()
-        : new OpenAIService(config.openai);
+      this.services.openai = new MockOpenAIService();
     }
     return this.services.openai;
+  }
+
+  getAirtableService() {
+    if (!this.services.airtable) {
+      this.services.airtable = new MockAirtableService();
+    }
+    return this.services.airtable;
+  }
+
+  getSendGridService() {
+    if (!this.services.sendgrid) {
+      this.services.sendgrid = new MockSendGridService();
+    }
+    return this.services.sendgrid;
+  }
+
+  getHeyGenService() {
+    if (!this.services.heygen) {
+      this.services.heygen = new MockHeyGenService();
+    }
+    return this.services.heygen;
+  }
+
+  getVAPIService() {
+    if (!this.services.vapi) {
+      this.services.vapi = new MockVAPIService();
+    }
+    return this.services.vapi;
   }
 }
 
