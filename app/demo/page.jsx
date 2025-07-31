@@ -5,6 +5,22 @@ import { CredentialsDisplay } from '../../components/demo/CredentialsDisplay';
 import { serviceFactory } from '../../lib/services/factory';
 
 export default function DemoPage() {
+  // Status states for each service
+  const [callStatus, setCallStatus] = useState('');
+  const [smsStatus, setSmsStatus] = useState('');
+  const [appointmentStatus, setAppointmentStatus] = useState('');
+  const [airtableStatus, setAirtableStatus] = useState('');
+  const [sendgridStatus, setSendgridStatus] = useState('');
+  const [heygenStatus, setHeygenStatus] = useState('');
+  const [vapiStatus, setVapiStatus] = useState('');
+
+  // Demo profiles configuration
+  const demoProfiles = {
+    basic: { twilio: true, sms: true, sendgrid: true, calendly: false, airtable: false, heygen: false, vapi: false },
+    professional: { twilio: true, sms: true, calendly: true, airtable: true, sendgrid: true, heygen: false, vapi: false },
+    enterprise: { twilio: true, sms: true, calendly: true, airtable: true, sendgrid: true, heygen: true, vapi: true }
+  };
+
   // Service enable/disable toggles
   const [enabledServices, setEnabledServices] = useState({
     twilio: true,
@@ -15,22 +31,6 @@ export default function DemoPage() {
     heygen: true,
     vapi: true
   });
-
-  // Status states for each service
-  const [callStatus, setCallStatus] = useState('');
-  const [smsStatus, setSmsStatus] = useState('');
-  const [appointmentStatus, setAppointmentStatus] = useState('');
-  const [airtableStatus, setAirtableStatus] = useState('');
-  const [sendgridStatus, setSendgridStatus] = useState('');
-  const [heygenStatus, setHeygenStatus] = useState('');
-  const [vapiStatus, setVapiStatus] = useState('');
-
-  // Demo profiles for quick switching
-  const demoProfiles = {
-    basic: { twilio: true, sms: true, sendgrid: true, calendly: false, airtable: false, heygen: false, vapi: false },
-    professional: { twilio: true, sms: true, calendly: true, airtable: true, sendgrid: true, heygen: false, vapi: false },
-    enterprise: { twilio: true, sms: true, calendly: true, airtable: true, sendgrid: true, heygen: true, vapi: true }
-  };
 
   const applyProfile = (profile) => {
     setEnabledServices(demoProfiles[profile]);
@@ -142,80 +142,10 @@ export default function DemoPage() {
           </div>
         </div>
 
-        {/* Service Toggles */}
-        <div className="bg-white p-6 rounded-lg shadow mb-6">
-          <h3 className="text-lg font-semibold mb-4">Enabled Services</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={enabledServices.twilio}
-                onChange={(e) => setEnabledServices({...enabledServices, twilio: e.target.checked})}
-                className="mr-2"
-              />
-              📞 Phone Calls
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={enabledServices.sms}
-                onChange={(e) => setEnabledServices({...enabledServices, sms: e.target.checked})}
-                className="mr-2"
-              />
-              💬 SMS
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={enabledServices.calendly}
-                onChange={(e) => setEnabledServices({...enabledServices, calendly: e.target.checked})}
-                className="mr-2"
-              />
-              📅 Calendly
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={enabledServices.airtable}
-                onChange={(e) => setEnabledServices({...enabledServices, airtable: e.target.checked})}
-                className="mr-2"
-              />
-              📊 Airtable
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={enabledServices.sendgrid}
-                onChange={(e) => setEnabledServices({...enabledServices, sendgrid: e.target.checked})}
-                className="mr-2"
-              />
-              📧 SendGrid
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={enabledServices.heygen}
-                onChange={(e) => setEnabledServices({...enabledServices, heygen: e.target.checked})}
-                className="mr-2"
-              />
-              🎭 HeyGen
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={enabledServices.vapi}
-                onChange={(e) => setEnabledServices({...enabledServices, vapi: e.target.checked})}
-                className="mr-2"
-              />
-              🤖 VAPI AI
-            </label>
-          </div>
-        </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Credentials Display */}
           <div>
-            <CredentialsDisplay />
+            <CredentialsDisplay enabledServices={enabledServices} />
           </div>
           
           {/* Feature Testing */}
@@ -337,9 +267,6 @@ export default function DemoPage() {
           <div className="bg-gray-50 p-4 rounded">
             <p className="text-sm text-gray-600">
               All activities in demo mode are simulated and logged here...
-            </p>
-            <p className="text-xs text-gray-500 mt-2">
-              Services enabled: {Object.entries(enabledServices).filter(([_, enabled]) => enabled).map(([service, _]) => service).join(', ')}
             </p>
           </div>
         </div>
